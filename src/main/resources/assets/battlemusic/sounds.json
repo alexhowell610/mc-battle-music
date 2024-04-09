@@ -1,0 +1,154 @@
+{
+    "brood_eetle": {
+        "sounds": [
+            {
+                "name": "battlemusic:brood_eetle",
+                "stream": true
+            }
+        ]
+    },
+    "ignis": {
+        "sounds": [
+            {
+                "name": "battlemusic:ignis",
+                "stream": true
+            }
+        ]
+    },
+    "mini": {
+        "sounds": [
+            {
+                "name": "battlemusic:mini",
+                "stream": true
+            }
+        ]
+    },
+    "lich": {
+        "sounds": [
+            {
+                "name": "battlemusic:lich",
+                "stream": true
+            }
+        ]
+    },
+    "mutant_enderman": {
+        "sounds": [
+            {
+                "name": "battlemusic:mutant_enderman",
+                "stream": true
+            }
+        ]
+    },
+    "wither": {
+        "sounds": [
+            {
+                "name": "battlemusic:wither",
+                "stream": true
+            }
+        ]
+    },
+    "ender_dragon": {
+        "sounds": [
+            {
+                "name": "battlemusic:ender_dragon", 
+                "stream": true
+            }
+        ]
+    },
+    "sun_spirit": {
+        "sounds": [
+            {
+                "name": "battlemusic:sun_spirit", 
+                "stream": true
+            }
+        ]
+    },
+    "void_worm": {
+        "sounds": [
+            {
+                "name": "battlemusic:void_worm", 
+                "stream": true
+            }
+        ]
+    },
+    "warden": {
+        "sounds": [
+            {
+                "name": "battlemusic:warden", 
+                "stream": true
+            }
+        ]
+    },
+    "ender_guardian": {
+        "sounds": [
+            {
+                "name": "battlemusic:ender_guardian", 
+                "stream": true
+            }
+        ]
+    },
+    "netherite_monstrosity": {
+        "sounds": [
+            {
+                "name": "battlemusic:netherite_monstrosity", 
+                "stream": true
+            }
+        ]
+    },
+    "harbinger": {
+        "sounds": [
+            {
+                "name": "battlemusic:harbinger", 
+                "stream": true
+            }
+        ]
+    },
+    "hydra": {
+        "sounds": [
+            {
+                "name": "battlemusic:hydra", 
+                "stream": true
+            }
+        ]
+    },
+    "ur_ghast": {
+        "sounds": [
+            {
+                "name": "battlemusic:ur_ghast", 
+                "stream": true
+            }
+        ]
+    },
+    "snow_queen": {
+        "sounds": [
+            {
+                "name": "battlemusic:snow_queen", 
+                "stream": true
+            }
+        ]
+    },
+    "naga": {
+        "sounds": [
+            {
+                "name": "battlemusic:naga", 
+                "stream": true
+            }
+        ]
+    },
+    "slider": {
+        "sounds": [
+            {
+                "name": "battlemusic:slider",
+                "stream": true
+            }
+        ]
+    },
+    "leviathan": {
+        "sounds": [
+            {
+                "name": "battlemusic:leviathan",
+                "stream": true
+            }
+        ]
+    }
+}
