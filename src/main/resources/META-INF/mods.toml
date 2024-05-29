@@ -17,7 +17,7 @@ By default, gives music to elder guardians, wardens, the wither, and the ender d
 [[dependencies.battlemusic]]
     modId="forge"
     mandatory=true
-    versionRange="[43,)"
+    versionRange="[44,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.battlemusic]]
