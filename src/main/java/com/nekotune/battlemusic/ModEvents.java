@@ -30,7 +30,7 @@ public abstract class ModEvents
         @SubscribeEvent
         public static void onLivingTick(LivingEvent.LivingTickEvent event) {
             LivingEntity entity = event.getEntity();
-            Level level = entity.getLevel();
+            Level level = entity.level();
             LocalPlayer player = Minecraft.getInstance().player;
             if (level.isClientSide() && player != null && entity instanceof Mob && EntityMusic.isValidEntity((Mob)entity)) {
                 // Check if music bound to current entity type is already playing and if entity can see the player

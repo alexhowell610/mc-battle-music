@@ -2,10 +2,6 @@ package com.nekotune.battlemusic;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.ForgeSoundType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -16,34 +12,36 @@ public class ModSounds
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, BattleMusic.MOD_ID);
 
-    public static final RegistryObject<SoundEvent> ENDER_DRAGON = registerSoundEvent("ender_dragon");
-    public static final RegistryObject<SoundEvent> WARDEN = registerSoundEvent("warden");
-    public static final RegistryObject<SoundEvent> WITHER = registerSoundEvent("wither");
-    public static final RegistryObject<SoundEvent> MINI = registerSoundEvent("mini");
-    // Endergetic
-    public static final RegistryObject<SoundEvent> BROOD_EETLE = registerSoundEvent("brood_eetle");
-    // L_Ender's Cataclysm
-    public static final RegistryObject<SoundEvent> IGNIS = registerSoundEvent("ignis");
-    public static final RegistryObject<SoundEvent> ENDER_GUARDIAN = registerSoundEvent("ender_guardian");
-    public static final RegistryObject<SoundEvent> HARBINGER = registerSoundEvent("harbinger");
-    public static final RegistryObject<SoundEvent> NETHERITE_MONSTROSITY = registerSoundEvent("netherite_monstrosity");
+    public static final RegistryObject<SoundEvent> ENDERMAN = registerSoundEvent("enderman");
+    public static final RegistryObject<SoundEvent> NECROMANCER = registerSoundEvent("necromancer");
+    public static final RegistryObject<SoundEvent> WITHER_STORM = registerSoundEvent("wither_storm");
+    public static final RegistryObject<SoundEvent> MINI1 = registerSoundEvent("mini1");
+    public static final RegistryObject<SoundEvent> MINI2 = registerSoundEvent("mini2");
+    public static final RegistryObject<SoundEvent> CAULDRON = registerSoundEvent("cauldron");
+    public static final RegistryObject<SoundEvent> ANCIENT = registerSoundEvent("ancient");
+    public static final RegistryObject<SoundEvent> ANCIENT_GUARDIAN = registerSoundEvent("ancient_guardian");
+    public static final RegistryObject<SoundEvent> ARENA1 = registerSoundEvent("arena1");
+    public static final RegistryObject<SoundEvent> ARENA2 = registerSoundEvent("arena2");
+    public static final RegistryObject<SoundEvent> ASCENSION = registerSoundEvent("ascension");
     // Twilight Forest
-    public static final RegistryObject<SoundEvent> HYDRA = registerSoundEvent("hydra");
-    public static final RegistryObject<SoundEvent> LICH = registerSoundEvent("lich");
-    public static final RegistryObject<SoundEvent> NAGA = registerSoundEvent("naga");
-    public static final RegistryObject<SoundEvent> UR_GHAST = registerSoundEvent("ur_ghast");
-    public static final RegistryObject<SoundEvent> SNOW_QUEEN = registerSoundEvent("snow_queen");
+    public static final RegistryObject<SoundEvent> BOSS = registerSoundEvent("boss");
+    public static final RegistryObject<SoundEvent> BROKEN_HEART_OF_ENDER = registerSoundEvent("broken_heart_of_ender");
+    public static final RegistryObject<SoundEvent> GHAST = registerSoundEvent("ghast");
+    public static final RegistryObject<SoundEvent> KERMETIC = registerSoundEvent("kermetic");
+    public static final RegistryObject<SoundEvent> MENTA_MENARDI = registerSoundEvent("menta_menardi");
     // Aether
-    public static final RegistryObject<SoundEvent> SUN_GOD = registerSoundEvent("sun_god");
-    public static final RegistryObject<SoundEvent> SLIDER = registerSoundEvent("slider");
+    public static final RegistryObject<SoundEvent> METALUNA = registerSoundEvent("metaluna");
+    public static final RegistryObject<SoundEvent> PORCUS_HUMUNGOUS = registerSoundEvent("porcus_humungous");
     // Mutant Creatures
-    public static final RegistryObject<SoundEvent> MUTANT_ENDERMAN = registerSoundEvent("mutant_enderman");
+    public static final RegistryObject<SoundEvent> REDSTONE_MONSTROSITY = registerSoundEvent("redstone_monstrosity");
     // Alex's Mobs
-    public static final RegistryObject<SoundEvent> VOID_WORM = registerSoundEvent("void_worm");
+    public static final RegistryObject<SoundEvent> SHATTERED = registerSoundEvent("shattered");
+    public static final RegistryObject<SoundEvent> SUMMIT = registerSoundEvent("summit");
+    public static final RegistryObject<SoundEvent> WILDFIRE = registerSoundEvent("wildfire");
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         ResourceLocation id = new ResourceLocation(BattleMusic.MOD_ID, name);
-        return SOUND_EVENTS.register(name, () -> new SoundEvent(id));
+        return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(id));
     }
 
     public static void register(IEventBus eventBus) {

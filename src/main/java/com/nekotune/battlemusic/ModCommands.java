@@ -32,13 +32,13 @@ public abstract class ModCommands
         float volume = context.getArgument("volume", float.class);
         ModConfigs.VOLUME.set((double) volume);
         EntityMusic.setMasterVolume(volume);
-        source.sendSuccess(Component.literal("Set battle music volume to " + volume), true);
+        source.sendSuccess(() -> Component.literal("Set battle music volume to " + volume), true);
         return 1;
     }
 
     private static int getVolume(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        source.sendSuccess(Component.literal("Battle music volume is currently set to " + ModConfigs.VOLUME.get()), true);
+        source.sendSuccess(() -> Component.literal("Battle music volume is currently set to " + ModConfigs.VOLUME.get()), true);
         return 1;
     }
 
@@ -46,13 +46,13 @@ public abstract class ModCommands
         CommandSourceStack source = context.getSource();
         boolean separate = context.getArgument("separate", boolean.class);
         ModConfigs.LINKED_TO_MUSIC.set(separate);
-        source.sendSuccess(Component.literal((separate) ? "Battle music volume is now separate from music volume" : "Battle music volume is now linked to music volume"), true);
+        source.sendSuccess(() -> Component.literal((separate) ? "Battle music volume is now separate from music volume" : "Battle music volume is now linked to music volume"), true);
         return 1;
     }
 
     private static int reload(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        source.sendSuccess(Component.literal("Reloaded battle music"), true);
+        source.sendSuccess(() -> Component.literal("Reloaded battle music"), true);
         EntityMusic.updateEntitySoundData();
         EntityMusic.setMasterVolume(ModConfigs.VOLUME.get().floatValue());
         return 1;

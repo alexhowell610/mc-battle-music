@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -54,11 +54,11 @@ public abstract class EntityMusic
             try {
                 ResourceLocation entityResource = ResourceLocation.read(entityDataString.substring(0, entityDataString.indexOf(';')))
                         .getOrThrow(false, Util.prefix("Encountered error while loading entity music data (entity)", LOGGER::warn));
-                EntityType<?> entityType = Registry.ENTITY_TYPE.get(entityResource);
+                EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(entityResource);
                 if (entityType == EntityType.PIG) { continue; }
                 ResourceLocation soundResource = ResourceLocation.read(entityDataString.substring(entityDataString.indexOf(';') + 1, entityDataString.lastIndexOf(';')))
                         .getOrThrow(false, Util.prefix("Encountered error while loading entity music data (sound)", LOGGER::warn));
-                SoundEvent soundEvent = Registry.SOUND_EVENT.get(soundResource);
+                SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.get(soundResource);
                 int priority = Integer.parseInt(entityDataString.substring(entityDataString.lastIndexOf(';')+1));
                 ENTITY_SOUND_DATA.put(entityType, new SoundData(soundEvent, priority));
             } catch (Exception e) {
@@ -100,7 +100,7 @@ public abstract class EntityMusic
     public static boolean isValidEntity(Mob mob) {
         LocalPlayer player = Minecraft.getInstance().player;
         assert player != null;
-        if (ENTITY_SOUND_DATA.get(mob.getType()) != null && mob.level.equals(player.level) &&
+        if (ENTITY_SOUND_DATA.get(mob.getType()) != null && mob.level().equals(player.level()) &&
                 !mob.isDeadOrDying() && !mob.isSleeping() && !mob.isAlliedTo(player.self()) && !mob.isNoAi()
                 && !(mob instanceof NeutralMob && !((NeutralMob) mob).isAngryAt(player))) {
             if (mob.getTarget() instanceof Player) { return true; }
@@ -177,6 +177,10 @@ public abstract class EntityMusic
             // Pitch up music when at low health (unless fighting the warden)
             if (this.PLAYER.getHealth() <= ModConfigs.HEALTH_PITCH_THRESH.get() && !(this.ENTITY instanceof Warden)) {
                 pitchMod += ModConfigs.HEALTH_PITCH_AMOUNT.get();
+            }
+            // Pitch up music during second phase of dragon fight
+            if (this.ENTITY instanceof EnderDragon && ((EnderDragon)this.ENTITY).nearestCrystal == null) {
+                pitchMod += ModConfigs.DRAGON_PITCH_AMOUNT.get();
             }
             this.pitch = pitchMod;
         }
