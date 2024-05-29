@@ -1,152 +1,176 @@
 {
-    "brood_eetle": {
+    "cauldron": {
         "sounds": [
             {
-                "name": "battlemusic:brood_eetle",
+                "name": "battlemusic:cauldron",
                 "stream": true
             }
         ]
     },
-    "ignis": {
+    "wildfire": {
         "sounds": [
             {
-                "name": "battlemusic:ignis",
+                "name": "battlemusic:wildfire",
                 "stream": true
             }
         ]
     },
-    "mini": {
+    "kermetic": {
         "sounds": [
             {
-                "name": "battlemusic:mini",
+                "name": "battlemusic:kermetic",
                 "stream": true
             }
         ]
     },
-    "lich": {
+    "mini1": {
         "sounds": [
             {
-                "name": "battlemusic:lich",
+                "name": "battlemusic:mini1",
                 "stream": true
             }
         ]
     },
-    "mutant_enderman": {
+    "boss": {
         "sounds": [
             {
-                "name": "battlemusic:mutant_enderman",
+                "name": "battlemusic:boss",
                 "stream": true
             }
         ]
     },
-    "wither": {
+    "enderman": {
         "sounds": [
             {
-                "name": "battlemusic:wither",
+                "name": "battlemusic:enderman",
                 "stream": true
             }
         ]
     },
-    "ender_dragon": {
+    "wither_storm": {
         "sounds": [
             {
-                "name": "battlemusic:ender_dragon", 
+                "name": "battlemusic:wither_storm",
                 "stream": true
             }
         ]
     },
-    "sun_spirit": {
+    "shattered": {
         "sounds": [
             {
-                "name": "battlemusic:sun_spirit", 
+                "name": "battlemusic:shattered",
                 "stream": true
             }
         ]
     },
-    "void_worm": {
+    "summit": {
         "sounds": [
             {
-                "name": "battlemusic:void_worm", 
+                "name": "battlemusic:summit", 
                 "stream": true
             }
         ]
     },
-    "warden": {
+    "ghast": {
         "sounds": [
             {
-                "name": "battlemusic:warden", 
+                "name": "battlemusic:ghast", 
                 "stream": true
             }
         ]
     },
-    "ender_guardian": {
+    "necromancer": {
         "sounds": [
             {
-                "name": "battlemusic:ender_guardian", 
+                "name": "battlemusic:necromancer",
                 "stream": true
             }
         ]
     },
-    "netherite_monstrosity": {
+    "broken_heart_of_ender": {
         "sounds": [
             {
-                "name": "battlemusic:netherite_monstrosity", 
+                "name": "battlemusic:broken_heart_of_ender", 
                 "stream": true
             }
         ]
     },
-    "harbinger": {
+    "redstone_monstrosity": {
         "sounds": [
             {
-                "name": "battlemusic:harbinger", 
+                "name": "battlemusic:redstone_monstrosity", 
                 "stream": true
             }
         ]
     },
-    "hydra": {
+    "ancient": {
         "sounds": [
             {
-                "name": "battlemusic:hydra", 
+                "name": "battlemusic:ancient", 
                 "stream": true
             }
         ]
     },
-    "ur_ghast": {
+    "arena1": {
         "sounds": [
             {
-                "name": "battlemusic:ur_ghast", 
+                "name": "battlemusic:arena1", 
                 "stream": true
             }
         ]
     },
-    "snow_queen": {
+    "metaluna": {
         "sounds": [
             {
-                "name": "battlemusic:snow_queen", 
+                "name": "battlemusic:metaluna", 
                 "stream": true
             }
         ]
     },
-    "naga": {
+    "ascension": {
         "sounds": [
             {
-                "name": "battlemusic:naga", 
+                "name": "battlemusic:ascension", 
                 "stream": true
             }
         ]
     },
-    "slider": {
+    "arena2": {
         "sounds": [
             {
-                "name": "battlemusic:slider",
+                "name": "battlemusic:arena2", 
                 "stream": true
             }
         ]
     },
-    "leviathan": {
+    "mini2": {
         "sounds": [
             {
-                "name": "battlemusic:leviathan",
+                "name": "battlemusic:mini2",
+                "stream": true
+            }
+        ]
+    },
+    "porcus_humungous": {
+        "sounds": [
+            {
+                "name": "battlemusic:porcus_humungous",
+                "stream": true
+            }
+        ]
+    },
+    "ancient_guardian": {
+        "sounds": [
+            {
+                "name": "battlemusic:ancient_guardian",
+                "stream": true
+            }
+        ]
+    },
+    "menta_menardi": {
+        "sounds": [
+            {
+                "name": "battlemusic:menta_menardi",
                 "stream": true
             }
         ]

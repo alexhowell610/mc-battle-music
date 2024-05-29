@@ -1,11 +1,10 @@
 package com.nekotune.battlemusic;
 
-import net.minecraft.Util;
+import com.mojang.serialization.DataResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -21,13 +20,14 @@ import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
+import static com.nekotune.battlemusic.BattleMusic.LOGGER;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class EntityMusic
@@ -50,19 +50,59 @@ public abstract class EntityMusic
     public static void updateEntitySoundData() {
         ENTITY_SOUND_DATA.clear();
         List<? extends String> entityDataStrings = ModConfigs.ENTITIES_SONGS.get();
+        final String ERROR_MSG = "Error loading entity music data from battlemusic config: ";
         for (String entityDataString : entityDataStrings) {
+            EntityType<?> entityType = null;
+            SoundEvent soundEvent = null;
+
+            String entityString = entityDataString.substring(0, entityDataString.indexOf(';'));
+            DataResult<ResourceLocation> weakEntityResource = ResourceLocation.read(entityString);
+            if (weakEntityResource.get().left().isPresent()) {
+                ResourceLocation resource = weakEntityResource.get().left().get();
+                entityType = ForgeRegistries.ENTITY_TYPES.getValue(resource);
+            }
+            if (entityType == null || entityType == EntityType.PIG) {
+                LOGGER.warn(ERROR_MSG + "Skipping invalid entity ID \"" + entityString + "\"");
+                continue;
+            }
+
+            String soundString = entityDataString.substring(entityDataString.indexOf(';') + 1, entityDataString.lastIndexOf(';'));
+            DataResult<ResourceLocation> weakSoundResource = ResourceLocation.read(soundString);
+            if (weakSoundResource.get().left().isPresent()) {
+                ResourceLocation resource = weakSoundResource.get().left().get();
+                soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(resource);
+            }
+            if (soundEvent == null) {
+                LOGGER.error(ERROR_MSG + "Invalid sound ID \"" + soundString + "\" in line \"" + entityDataString + "\", skipping");
+                continue;
+            }
+
+            int priority = 0;
+            String priorityString = entityDataString.substring(entityDataString.lastIndexOf(';') + 1, entityDataString.lastIndexOf(';') + 2);
             try {
-                ResourceLocation entityResource = ResourceLocation.read(entityDataString.substring(0, entityDataString.indexOf(';')))
-                        .getOrThrow(false, Util.prefix("Encountered error while loading entity music data (entity)", LOGGER::warn));
-                EntityType<?> entityType = Registry.ENTITY_TYPE.get(entityResource);
-                if (entityType == EntityType.PIG) { continue; }
-                ResourceLocation soundResource = ResourceLocation.read(entityDataString.substring(entityDataString.indexOf(';') + 1, entityDataString.lastIndexOf(';')))
-                        .getOrThrow(false, Util.prefix("Encountered error while loading entity music data (sound)", LOGGER::warn));
-                SoundEvent soundEvent = Registry.SOUND_EVENT.get(soundResource);
-                int priority = Integer.parseInt(entityDataString.substring(entityDataString.lastIndexOf(';')+1));
-                ENTITY_SOUND_DATA.put(entityType, new SoundData(soundEvent, priority));
-            } catch (Exception e) {
-                LOGGER.warn("Error loading entity music data from battlemusic config: " + e.getMessage());
+                priority = Integer.parseInt(priorityString);
+            } catch(Exception e) {
+                LOGGER.error(ERROR_MSG + "Invalid priority \"" + priorityString + "\" in line \"" + entityDataString + "\", defaulting to 0");
+            }
+
+            LOGGER.debug("Added battle music " + soundEvent.getLocation() + " to " + entityType + " with priority " + priority);
+            ENTITY_SOUND_DATA.put(entityType, new SoundData(soundEvent, priority));
+        }
+
+        String defaultSongString = ModConfigs.DEFAULT_SONG.get();
+        if (!defaultSongString.isEmpty()) {
+            SoundEvent defaultSong = null;
+            DataResult<ResourceLocation> weakDefaultSongResource = ResourceLocation.read(defaultSongString);
+            if (weakDefaultSongResource.get().left().isPresent()) {
+                ResourceLocation resource = weakDefaultSongResource.get().left().get();
+                defaultSong = ForgeRegistries.SOUND_EVENTS.getValue(resource);
+            }
+            if (defaultSong == null) {
+                LOGGER.error(ERROR_MSG + "Invalid default song sound ID \"" + defaultSongString + "\"");
+            } else {
+                for (EntityType<?> e : ForgeRegistries.ENTITY_TYPES.getValues()) {
+                    ENTITY_SOUND_DATA.putIfAbsent(e, new SoundData(defaultSong, Integer.MIN_VALUE));
+                }
             }
         }
         for (EntityMusic.EntityMusicInstance instance : INSTANCES.values()) {
@@ -100,7 +140,7 @@ public abstract class EntityMusic
     public static boolean isValidEntity(Mob mob) {
         LocalPlayer player = Minecraft.getInstance().player;
         assert player != null;
-        if (ENTITY_SOUND_DATA.get(mob.getType()) != null && mob.level.equals(player.level) &&
+        if (ENTITY_SOUND_DATA.get(mob.getType()) != null && mob.level().equals(player.level()) &&
                 !mob.isDeadOrDying() && !mob.isSleeping() && !mob.isAlliedTo(player.self()) && !mob.isNoAi()
                 && !(mob instanceof NeutralMob && !((NeutralMob) mob).isAngryAt(player))) {
             if (mob.getTarget() instanceof Player) { return true; }
@@ -149,9 +189,11 @@ public abstract class EntityMusic
         @Override
         public void tick() {
             if (this.isStopped()) return;
+
             // Mute all other music
             SoundManager soundManager = Minecraft.getInstance().getSoundManager();
             soundManager.stop(null, SoundSource.MUSIC);
+
             // Fade
             if (this.fadeSeconds > 0f) {
                 if (this.fadingIn) {
@@ -173,10 +215,21 @@ public abstract class EntityMusic
                     fadeOut(2);
                 }
             }
+
             float pitchMod = 1f;
             // Pitch up music when at low health (unless fighting the warden)
-            if (this.PLAYER.getHealth() <= ModConfigs.HEALTH_PITCH_THRESH.get() && !(this.ENTITY instanceof Warden)) {
+            boolean belowHpThreshold;
+            if (ModConfigs.HEALTH_PITCH_PERCENT.get()) {
+                belowHpThreshold = (this.PLAYER.getHealth()/this.PLAYER.getMaxHealth())*100 <= ModConfigs.HEALTH_PITCH_THRESH.get();
+            } else {
+                belowHpThreshold = this.PLAYER.getHealth() <= ModConfigs.HEALTH_PITCH_THRESH.get();
+            }
+            if (belowHpThreshold && !(this.ENTITY instanceof Warden)) {
                 pitchMod += ModConfigs.HEALTH_PITCH_AMOUNT.get();
+            }
+            // Pitch up music during second phase of dragon fight
+            if (this.ENTITY instanceof EnderDragon && ((EnderDragon)this.ENTITY).nearestCrystal == null) {
+                pitchMod += ModConfigs.DRAGON_PITCH_AMOUNT.get();
             }
             this.pitch = pitchMod;
         }

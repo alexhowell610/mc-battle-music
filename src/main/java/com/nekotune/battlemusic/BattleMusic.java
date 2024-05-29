@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 public class BattleMusic
 {
     public static final String MOD_ID = "battlemusic";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public BattleMusic()
     {
