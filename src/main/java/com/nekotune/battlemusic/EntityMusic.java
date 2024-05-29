@@ -140,7 +140,7 @@ public abstract class EntityMusic
     public static boolean isValidEntity(Mob mob) {
         LocalPlayer player = Minecraft.getInstance().player;
         assert player != null;
-        if (ENTITY_SOUND_DATA.get(mob.getType()) != null && mob.level().equals(player.level()) &&
+        if (ENTITY_SOUND_DATA.get(mob.getType()) != null && mob.level.equals(player.level) &&
                 !mob.isDeadOrDying() && !mob.isSleeping() && !mob.isAlliedTo(player.self()) && !mob.isNoAi()
                 && !(mob instanceof NeutralMob && !((NeutralMob) mob).isAngryAt(player))) {
             if (mob.getTarget() instanceof Player) { return true; }
