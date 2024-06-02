@@ -1,28 +1,27 @@
 modLoader="javafml"
-loaderVersion="[41,43]"
+loaderVersion="[36,37)"
 license="All rights reserved"
 [[mods]]
 modId="battlemusic"
 version="${file.jarVersion}"
 displayName="Battle Music"
-displayTest="IGNORE_ALL_VERSION"
 logoFile="battlemusic.png"
 credits="Minecraft Dungeons, Storymode, & Legends (Soundtrack)" #optional
 authors="NekoTune" #optional
 description='''
 Adds fully configurable battle music
 
-By default, gives music to elder guardians, wardens, the wither, and the ender dragon.
+By default, gives music to elder guardians, the wither, and the ender dragon.
 '''
 [[dependencies.battlemusic]]
     modId="forge"
     mandatory=true
-    versionRange="[41,43]"
+    versionRange="[36,37)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.battlemusic]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19,1.19.2]"
+    versionRange="[1.16.5]"
     ordering="NONE"
     side="CLIENT"

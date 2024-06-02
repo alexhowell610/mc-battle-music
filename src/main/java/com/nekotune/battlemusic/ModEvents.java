@@ -1,10 +1,10 @@
 package com.nekotune.battlemusic;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.level.Level;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -28,11 +28,11 @@ public abstract class ModEvents
 
         // Update battle music
         @SubscribeEvent
-        public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-            LivingEntity entity = event.getEntity();
-            Level level = entity.level;
-            LocalPlayer player = Minecraft.getInstance().player;
-            if (level.isClientSide() && player != null && entity instanceof Mob && EntityMusic.isValidEntity((Mob)entity)) {
+        public static void onLivingTick(LivingEvent.LivingUpdateEvent event) {
+            LivingEntity entity = event.getEntityLiving();
+            World world = entity.level;
+            ClientPlayerEntity player = Minecraft.getInstance().player;
+            if (world.isClientSide() && player != null && entity instanceof MobEntity && EntityMusic.isValidEntity((MobEntity) entity)) {
                 // Check if music bound to current entity type is already playing and if entity can see the player
                 EntityMusic.SoundData soundData = EntityMusic.getEntitySoundData().get(entity.getType());
                 if (soundData != null && !EntityMusic.isPlaying(soundData.soundEvent())) {
@@ -56,7 +56,7 @@ public abstract class ModEvents
                         // Fade out all lower priorities
                         lowerPriorityInstances.forEach(instance -> instance.fadeOut(ModConfigs.FADE_TIME.get().floatValue()));
                         // Play battle music
-                        EntityMusic.spawnInstance(soundData, player, (Mob)entity, ModConfigs.FADE_TIME.get().floatValue());
+                        EntityMusic.spawnInstance(soundData, player, (MobEntity)entity, ModConfigs.FADE_TIME.get().floatValue());
                     }
                 }
             }
