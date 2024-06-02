@@ -57,8 +57,8 @@ public abstract class EntityMusic
 
             String entityString = entityDataString.substring(0, entityDataString.indexOf(';'));
             DataResult<ResourceLocation> weakEntityResource = ResourceLocation.read(entityString);
-            if (weakEntityResource.get().left().isPresent()) {
-                ResourceLocation resource = weakEntityResource.get().left().get();
+            if (weakEntityResource.result().isPresent()) {
+                ResourceLocation resource = weakEntityResource.result().get();
                 entityType = ForgeRegistries.ENTITY_TYPES.getValue(resource);
             }
             if (entityType == null || entityType == EntityType.PIG) {
@@ -68,8 +68,8 @@ public abstract class EntityMusic
 
             String soundString = entityDataString.substring(entityDataString.indexOf(';') + 1, entityDataString.lastIndexOf(';'));
             DataResult<ResourceLocation> weakSoundResource = ResourceLocation.read(soundString);
-            if (weakSoundResource.get().left().isPresent()) {
-                ResourceLocation resource = weakSoundResource.get().left().get();
+            if (weakSoundResource.result().isPresent()) {
+                ResourceLocation resource = weakSoundResource.result().get();
                 soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(resource);
             }
             if (soundEvent == null) {
@@ -93,8 +93,8 @@ public abstract class EntityMusic
         if (!defaultSongString.isEmpty()) {
             SoundEvent defaultSong = null;
             DataResult<ResourceLocation> weakDefaultSongResource = ResourceLocation.read(defaultSongString);
-            if (weakDefaultSongResource.get().left().isPresent()) {
-                ResourceLocation resource = weakDefaultSongResource.get().left().get();
+            if (weakDefaultSongResource.result().isPresent()) {
+                ResourceLocation resource = weakDefaultSongResource.result().get();
                 defaultSong = ForgeRegistries.SOUND_EVENTS.getValue(resource);
             }
             if (defaultSong == null) {
