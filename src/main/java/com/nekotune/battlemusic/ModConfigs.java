@@ -32,7 +32,11 @@ public abstract class ModConfigs
                             > Values below zero shift the pitch down, above zero shift the pitch up   \s
                             > Set to zero to disable  \s""")
                         .defineInRange("health_pitch_amount", 0.05D, -0.5D, 1D);
-        DRAGON_PITCH_AMOUNT = BUILDER.comment("\nHow much the battle music changes in pitch during the second phase of the Ender Dragon fightValues below zero shift the pitch down, above zero shift the pitch upSet to zero to disable")
+        DRAGON_PITCH_AMOUNT = BUILDER.comment("""
+                        
+                        How much the battle music changes in pitch during the second phase of the Ender Dragon fight   \s
+                            > Values below zero shift the pitch down, above zero shift the pitch up \s
+                            > Set to zero to disable""")
                 .defineInRange("dragon_pitch_amount", 0.05D, -0.5D, 1D);
         HEALTH_PITCH_THRESH = BUILDER.comment("\nAt what HP should the battle music shift in pitch")
                         .defineInRange("health_pitch_thresh", 6, 1, Integer.MAX_VALUE);
