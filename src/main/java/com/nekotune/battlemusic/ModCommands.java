@@ -29,13 +29,13 @@ public abstract class ModCommands
                         .executes(ModCommands::separateVolume))))
             .then(Commands.literal("reload")
                 .executes(ModCommands::reload))
-            .then(Commands.literal("setMusic")
+            .then(Commands.literal("set")
                 .then(Commands.argument("entity", ResourceLocationArgument.id()).suggests(SuggestionProviders.SUMMONABLE_ENTITIES)
-                    .executes((ctx) -> ModCommands.setMusic(ctx, false, false))
+                    .executes((ctx) -> ModCommands.set(ctx, false, false))
                     .then(Commands.argument("song", ResourceLocationArgument.id()).suggests(SuggestionProviders.AVAILABLE_SOUNDS)
-                        .executes((ctx) -> ModCommands.setMusic(ctx, true, false))
+                        .executes((ctx) -> ModCommands.set(ctx, true, false))
                     .then(Commands.argument("priority", IntegerArgumentType.integer())
-                        .executes((ctx) -> ModCommands.setMusic(ctx, true, true))))));
+                        .executes((ctx) -> ModCommands.set(ctx, true, true))))));
         dispatcher.register(builder);
     }
 
@@ -76,7 +76,7 @@ public abstract class ModCommands
         return 1;
     }
 
-    private static int setMusic(CommandContext<CommandSourceStack> context, boolean songDef, boolean priorityDef) {
+    private static int set(CommandContext<CommandSourceStack> context, boolean songDef, boolean priorityDef) {
         CommandSourceStack source = context.getSource();
         ResourceLocation entity = context.getArgument("entity", ResourceLocation.class);
         List<String> data = new ArrayList<>(ModConfigs.ENTITIES_SONGS.get());
