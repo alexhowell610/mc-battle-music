@@ -43,6 +43,7 @@ public abstract class ModCommands
         CommandSourceStack source = context.getSource();
         float volume = context.getArgument("volume", float.class);
         ModConfigs.VOLUME.set((double) volume);
+        ModConfigs.VOLUME.save();
         EntityMusic.setMasterVolume(volume);
         source.sendSuccess(() -> Component.literal("Set battle music volume to " + volume), true);
         return 1;
@@ -58,6 +59,7 @@ public abstract class ModCommands
         CommandSourceStack source = context.getSource();
         boolean separate = context.getArgument("separate", boolean.class);
         ModConfigs.LINKED_TO_MUSIC.set(separate);
+        ModConfigs.LINKED_TO_MUSIC.save();
         source.sendSuccess(() -> Component.literal((separate) ? "Battle music volume is now separate from music volume" : "Battle music volume is now linked to music volume"), true);
         return 1;
     }
@@ -77,19 +79,19 @@ public abstract class ModCommands
     private static int setMusic(CommandContext<CommandSourceStack> context, boolean songDef, boolean priorityDef) {
         CommandSourceStack source = context.getSource();
         ResourceLocation entity = context.getArgument("entity", ResourceLocation.class);
-        List<? extends String> defined = ModConfigs.ENTITIES_SONGS.get();
+        List<String> data = new ArrayList<>(ModConfigs.ENTITIES_SONGS.get());
         if (!songDef) {
             List<Integer> indices = new ArrayList<>(List.of());
-            for (int i = 0; i < defined.size(); i++) {
-                String item = defined.get(i);
+            for (int i = 0; i < data.size(); i++) {
+                String item = data.get(i);
                 if (item.substring(0, 2).equalsIgnoreCase(entity.toString())) {
                     indices.add(0, i);
                 }
             }
             for (int i : indices) {
-                defined.remove(i);
+                data.remove(i);
             }
-            ModConfigs.ENTITIES_SONGS.set(defined);
+            ModConfigs.ENTITIES_SONGS.set(data);
             ModConfigs.ENTITIES_SONGS.save();
             source.sendSuccess(() -> Component.literal("Removed battle music from entity " + entity.getPath()), true);
         } else {
@@ -98,13 +100,10 @@ public abstract class ModCommands
             if (priorityDef) {
                 priority = context.getArgument("priority", int.class);
             }
-            List<String> data = new ArrayList<>(List.of());
-            data.addAll(defined);
-            data.add(entity.toString() + ';' + song.toString() + ';' + priority);
-            defined = ModConfigs.BUILDER.defineListAllowEmpty(List.of("entities_songs"), () -> data, a -> true).get();
-            ModConfigs.ENTITIES_SONGS.set(defined);
-            ModConfigs.ENTITIES_SONGS.save();
             final int p = priority;
+            data.add(entity.toString() + ';' + song.toString() + ';' + p);
+            ModConfigs.ENTITIES_SONGS.set(data);
+            ModConfigs.ENTITIES_SONGS.save();
             source.sendSuccess(() -> Component.literal("Set battle music for entity " + entity.getPath() + " to sound " + song + " with priority " + p), true);
         }
         return ModCommands.reload();
