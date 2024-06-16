@@ -80,32 +80,40 @@ public abstract class ModCommands
         CommandSourceStack source = context.getSource();
         ResourceLocation entity = context.getArgument("entity", ResourceLocation.class);
         List<String> data = new ArrayList<>(ModConfigs.ENTITIES_SONGS.get());
-        if (!songDef) {
-            List<Integer> indices = new ArrayList<>(List.of());
-            for (int i = 0; i < data.size(); i++) {
-                String item = data.get(i);
-                if (item.substring(0, 2).equalsIgnoreCase(entity.toString())) {
-                    indices.add(0, i);
-                }
-            }
-            for (int i : indices) {
+        int priority = 0;
+        boolean changes = false;
+
+        // Remove old data
+        for (int i = 0; i < data.size(); i++) {
+            String item = data.get(i);
+            if (item.substring(0, item.indexOf(';')).equalsIgnoreCase(entity.toString())) {
+                priority = Integer.parseInt(item.substring(item.lastIndexOf(';')+1));
                 data.remove(i);
+                changes = true;
+                i--;
             }
-            ModConfigs.ENTITIES_SONGS.set(data);
-            ModConfigs.ENTITIES_SONGS.save();
-            source.sendSuccess(() -> Component.literal("Removed battle music from entity " + entity.getPath()), true);
-        } else {
+        }
+
+        // Set new data
+        String success;
+        if (songDef) {
             ResourceLocation song = context.getArgument("song", ResourceLocation.class);
-            int priority = 0;
             if (priorityDef) {
                 priority = context.getArgument("priority", int.class);
             }
-            final int p = priority;
-            data.add(entity.toString() + ';' + song.toString() + ';' + p);
+            data.add(entity.toString() + ';' + song.toString() + ';' + priority);
             ModConfigs.ENTITIES_SONGS.set(data);
             ModConfigs.ENTITIES_SONGS.save();
-            source.sendSuccess(() -> Component.literal("Set battle music for entity " + entity.getPath() + " to sound " + song + " with priority " + p), true);
+            success = "Set battle music for entity " + entity.getPath() + " to sound " + song + " with priority " + priority;
+        } else if (changes) {
+            ModConfigs.ENTITIES_SONGS.set(data);
+            ModConfigs.ENTITIES_SONGS.save();
+            success = "Removed battle music from entity " + entity.getPath();
+        } else {
+            source.sendFailure(Component.literal("No battle music set for entity " + entity.getPath()));
+            return 1;
         }
+        source.sendSuccess(() -> Component.literal(success), true);
         return ModCommands.reload();
     }
 }
