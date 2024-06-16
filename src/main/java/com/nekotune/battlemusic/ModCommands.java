@@ -30,12 +30,12 @@ public abstract class ModCommands
             .then(Commands.literal("reload")
                 .executes(ModCommands::reload))
             .then(Commands.literal("setMusic")
-                .then(Commands.argument("entity", ResourceLocationArgument.id()).suggests(SuggestionProviders.SUMMONABLE_ENTITIES))
-                    .executes((ctx) -> ModCommands.setMusic(ctx, false, false))
-                    .then(Commands.argument("song", ResourceLocationArgument.id()).suggests(SuggestionProviders.AVAILABLE_SOUNDS))
-                        .executes((ctx) -> ModCommands.setMusic(ctx, true, false))
-                    .then(Commands.argument("priority", IntegerArgumentType.integer()))
-                        .executes((ctx) -> ModCommands.setMusic(ctx, true, true)));
+                .then(Commands.argument("entity", ResourceLocationArgument.id()).suggests(SuggestionProviders.SUMMONABLE_ENTITIES)
+                    .executes((ctx) -> ModCommands.setMusic(ctx, false, false)))
+                    .then(Commands.argument("song", ResourceLocationArgument.id()).suggests(SuggestionProviders.AVAILABLE_SOUNDS)
+                        .executes((ctx) -> ModCommands.setMusic(ctx, true, false)))
+                    .then(Commands.argument("priority", IntegerArgumentType.integer())
+                        .executes((ctx) -> ModCommands.setMusic(ctx, true, true))));
         dispatcher.register(builder);
     }
 
