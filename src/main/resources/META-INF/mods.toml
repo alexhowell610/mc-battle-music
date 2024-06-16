@@ -3,7 +3,7 @@ loaderVersion="[44,50)"
 license="All rights reserved"
 [[mods]]
 modId="battlemusic"
-version="1.0.1"
+version="1.0.2"
 displayName="Battle Music"
 displayTest="IGNORE_ALL_VERSION"
 logoFile="battlemusic.png"
