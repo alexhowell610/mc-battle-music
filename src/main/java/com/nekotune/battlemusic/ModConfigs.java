@@ -36,7 +36,7 @@ public abstract class ModConfigs
                         
                         How much the battle music changes in pitch during the second phase of the Ender Dragon fight   \s
                             > Values below zero shift the pitch down, above zero shift the pitch up \s
-                            > Set to zero to disable""")
+                            > Set to zero to disable    \s""")
                 .defineInRange("dragon_pitch_amount", 0.05D, -0.5D, 1D);
         HEALTH_PITCH_THRESH = BUILDER.comment("\nAt what HP should the battle music shift in pitch")
                         .defineInRange("health_pitch_thresh", 6, 1, Integer.MAX_VALUE);
@@ -58,7 +58,6 @@ public abstract class ModConfigs
                                 "minecraft:warden;battlemusic:necromancer;1",
                                 "minecraft:wither;battlemusic:wither_storm;2",
                                 "minecraft:ender_dragon;battlemusic:enderman;5",
-                                "iter_rpg:hobgoblin;battlemusic:mini1;0",
                                 "queen_bee:queen_bee;battlemusic:mini1;0",
                                 "irons_spellbooks:dead_king;battlemusic:boss;2",
                                 "irons_spellbooks:citadel_keeper;battlemusic:mini1;0",
@@ -67,15 +66,14 @@ public abstract class ModConfigs
                                 "upgrade_aquatic:great_thrasher;battlemusic:mini1;0",
                                 "born_in_chaos_v1:dire_hound_leader;battlemusic:mini1;0",
                                 "born_in_chaos_v1:supreme_bonescaller;battlemusic:mini1;0",
-                                "alexscaves:luxtructosaurus;battlemusic:menta_menardi;3",
+                                "born_in_chaos_v1:lord_pumpkinhead;battlemusic:mini2;0",
+                                "alexscaves:luxtructosaurus;battlemusic:porcus_humungous;5",
                                 "alexscaves:tremorzilla;battlemusic:metaluna;2",
                                 "alexscaves:magnetron;battlemusic:mini2;0",
                                 "alexscaves:forsaken;battlemusic:mini2;1",
                                 "alexscaves:brainiac;battlemusic:mini1;0",
                                 "alexsmobs:void_worm;battlemusic:ghast;4",
                                 "alexsmobs:warped_mosco;battlemusic:mini1;0",
-                                "plenty_of_golems:ancient_of_prismarine;battlemusic:mini2;3",
-                                "born_in_chaos_v1:lord_pumpkinhead;battlemusic:mini2;0",
                                 "endergetic:brood_eetle;battlemusic:cauldron;2",
                                 "aether:slider;battlemusic:mini2;2",
                                 "aether:valkyrie;battlemusic:mini1;0",
@@ -83,7 +81,8 @@ public abstract class ModConfigs
                                 "aether:valkyrie_queen;battlemusic:mini2;2",
                                 "cataclysm:ender_golem;battlemusic:mini2;0",
                                 "cataclysm:ignited_revenant;battlemusic:mini2;0",
-                                "cataclysm:ender_guardian;battlemusic:porcus_humungous;4",
+                                "cataclysm:ignited_berserker;battlemusic:mini2;0",
+                                "cataclysm:ender_guardian;battlemusic:menta_menardi;4",
                                 "cataclysm:netherite_monstrosity;battlemusic:redstone_monstrosity;4",
                                 "cataclysm:ignis;battlemusic:wildfire;4",
                                 "cataclysm:the_harbinger;battlemusic:ancient;4",
@@ -108,15 +107,10 @@ public abstract class ModConfigs
                                 "twilightforest:phantom_knight;battlemusic:mini2;1",
                                 "twilightforest:ur_ghast;battlemusic:metaluna;3",
                                 "twilightforest:snow_queen;battlemusic:ascension;3",
-                                "mutant_mobs:mutant_zombie;battlemusic:mini1;0",
-                                "mutant_mobs:mutant_skeleton;battlemusic:mini1;0",
-                                "mutant_mobs:mutant_creeper;battlemusic:mini2;0",
-                                "mutant_mobs:mutant_enderman;battlemusic:shattered;1",
-                                "mutant_more:mutant_blaze;battlemusic:mini2;1",
-                                "mutant_more:mutant_shulker;battlemusic:mini2;1",
-                                "mutant_more:mutant_wither_skeleton;battlemusic:mini1;0",
-                                "rottencreatures:dead_beard;battlemusic:mini1;0",
-                                "rottencreatures:immortal;battlemusic:mini1;0"
+                                "mutantmonsters:mutant_zombie;battlemusic:mini1;0",
+                                "mutantmonsters:mutant_skeleton;battlemusic:mini1;0",
+                                "mutantmonsters:mutant_creeper;battlemusic:mini2;0",
+                                "mutantmonsters:mutant_enderman;battlemusic:shattered;1"
                                 ), a -> true);
 
         DEFAULT_SONG = BUILDER.comment("""

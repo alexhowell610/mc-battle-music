@@ -15,9 +15,12 @@ import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -229,7 +232,10 @@ public abstract class EntityMusic
             }
             // Pitch up music during second phase of dragon fight
             if (this.ENTITY instanceof EnderDragon && ((EnderDragon)this.ENTITY).nearestCrystal == null) {
-                pitchMod += ModConfigs.DRAGON_PITCH_AMOUNT.get();
+                List<EndCrystal> list = this.ENTITY.getLevel().getEntitiesOfClass(EndCrystal.class, AABB.ofSize(new Vec3(0, 60, 0), 64, 64, 64));
+                if (list.isEmpty()) {
+                    pitchMod += ModConfigs.DRAGON_PITCH_AMOUNT.get();
+                }
             }
             this.pitch = pitchMod;
         }
