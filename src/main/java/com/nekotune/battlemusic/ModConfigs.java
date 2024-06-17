@@ -67,7 +67,7 @@ public abstract class ModConfigs
                                 "born_in_chaos_v1:dire_hound_leader;battlemusic:mini1;0",
                                 "born_in_chaos_v1:supreme_bonescaller;battlemusic:mini1;0",
                                 "born_in_chaos_v1:lord_pumpkinhead;battlemusic:mini2;0",
-                                "alexscaves:luxtructosaurus;battlemusic:porcus_humungous;3",
+                                "alexscaves:luxtructosaurus;battlemusic:porcus_humungous;5",
                                 "alexscaves:tremorzilla;battlemusic:metaluna;2",
                                 "alexscaves:magnetron;battlemusic:mini2;0",
                                 "alexscaves:forsaken;battlemusic:mini2;1",
