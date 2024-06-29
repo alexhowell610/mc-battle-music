@@ -12,7 +12,7 @@ public abstract class ModConfigs
     public static final ForgeConfigSpec.ConfigValue<Double> VOLUME;
     public static final ForgeConfigSpec.ConfigValue<Boolean> LINKED_TO_MUSIC;
     public static final ForgeConfigSpec.ConfigValue<Double> HEALTH_PITCH_AMOUNT;
-    public static final ForgeConfigSpec.ConfigValue<Double> DRAGON_PITCH_AMOUNT;
+    public static final ForgeConfigSpec.ConfigValue<Double> PHASE2_PITCH_AMOUNT;
     public static final ForgeConfigSpec.ConfigValue<Integer> HEALTH_PITCH_THRESH;
     public static final ForgeConfigSpec.ConfigValue<Boolean> HEALTH_PITCH_PERCENT;
     public static final ForgeConfigSpec.ConfigValue<Double> FADE_TIME;
@@ -32,12 +32,12 @@ public abstract class ModConfigs
                             > Values below zero shift the pitch down, above zero shift the pitch up   \s
                             > Set to zero to disable  \s""")
                         .defineInRange("health_pitch_amount", 0.05D, -0.5D, 1D);
-        DRAGON_PITCH_AMOUNT = BUILDER.comment("""
+        PHASE2_PITCH_AMOUNT = BUILDER.comment("""
                         
-                        How much the battle music changes in pitch during the second phase of the Ender Dragon fight   \s
+                        How much the battle music changes in pitch during the second phases of the Ender Dragon and Wither fights   \s
                             > Values below zero shift the pitch down, above zero shift the pitch up \s
                             > Set to zero to disable    \s""")
-                .defineInRange("dragon_pitch_amount", 0.05D, -0.5D, 1D);
+                .defineInRange("phase2_pitch_amount", 0.05D, -0.5D, 1D);
         HEALTH_PITCH_THRESH = BUILDER.comment("\nAt what HP should the battle music shift in pitch")
                         .defineInRange("health_pitch_thresh", 6, 1, Integer.MAX_VALUE);
         HEALTH_PITCH_PERCENT = BUILDER.comment("""
@@ -77,7 +77,7 @@ public abstract class ModConfigs
                                 "endergetic:brood_eetle;battlemusic:cauldron;2",
                                 "aether:slider;battlemusic:mini2;2",
                                 "aether:valkyrie;battlemusic:mini1;0",
-                                "aether:sun_god;battlemusic:summit;3",
+                                "aether:sun_spirit;battlemusic:summit;3",
                                 "aether:valkyrie_queen;battlemusic:mini2;2",
                                 "cataclysm:ender_golem;battlemusic:mini2;0",
                                 "cataclysm:ignited_revenant;battlemusic:mini2;0",

@@ -3,8 +3,7 @@ package com.nekotune.battlemusic;
 import com.mojang.serialization.DataResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
-import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.client.resources.sounds.AbstractSoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -17,6 +16,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
@@ -24,8 +24,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,16 +35,8 @@ public abstract class EntityMusic
 {
     public record SoundData(SoundEvent soundEvent, int priority){}
     public static final double MAX_SONG_RANGE = 256D;
+    public static Instance playing = null;
     private static float masterVolume = ModConfigs.VOLUME.get().floatValue();
-
-    // Hashmap of all currently running entity music instances
-    private static final HashMap<SoundEvent, EntityMusicInstance> INSTANCES = new HashMap<>();
-    public static boolean isPlaying(SoundEvent soundEvent) {
-        return (INSTANCES.get(soundEvent) != null);
-    }
-    public static HashMap<SoundEvent, EntityMusicInstance> getInstances() {
-        return cloneHashMap(INSTANCES);
-    }
 
     // Static hashmap of what entities play what sounds
     private static final HashMap<EntityType<?>, SoundData> ENTITY_SOUND_DATA = new HashMap<>();
@@ -65,7 +55,7 @@ public abstract class EntityMusic
                 entityType = ForgeRegistries.ENTITY_TYPES.getValue(resource);
             }
             if (entityType == null || entityType == EntityType.PIG) {
-                LOGGER.warn(ERROR_MSG + "Skipping invalid entity ID \"" + entityString + "\"");
+                LOGGER.warn(ERROR_MSG + "Skipping invalid entity ID \"" + entityString + "\" (You can ignore this warning)");
                 continue;
             }
 
@@ -108,10 +98,11 @@ public abstract class EntityMusic
                 }
             }
         }
-        for (EntityMusic.EntityMusicInstance instance : INSTANCES.values()) {
-            instance.destroy();
+        if (playing != null) {
+            playing.destroy();
         }
     }
+
     static {
         updateEntitySoundData();
     }
@@ -131,18 +122,21 @@ public abstract class EntityMusic
         if (ModConfigs.LINKED_TO_MUSIC.get()) {
             newVolume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MUSIC);
         }
-        for(EntityMusicInstance instance : getInstances().values()) {
-            instance.setVolume(instance.getVolume() * (newVolume / masterVolume));
-            masterVolume = newVolume;
-            if (instance.getVolume() > masterVolume) {
-                instance.setVolume(masterVolume);
-            }
+
+        playing.setVolume(playing.getVolume() * (newVolume / masterVolume));
+        masterVolume = newVolume;
+        if (playing.getVolume() > masterVolume) {
+            playing.setVolume(masterVolume);
         }
+    }
+
+    public static float getMasterVolume() {
+        return masterVolume;
     }
 
     public static boolean isValidEntity(Mob mob) {
         LocalPlayer player = Minecraft.getInstance().player;
-        assert player != null;
+        if (player == null) return false;
         if (ENTITY_SOUND_DATA.get(mob.getType()) != null && mob.level().equals(player.level()) &&
                 !mob.isDeadOrDying() && !mob.isSleeping() && !mob.isAlliedTo(player.self()) && !mob.isNoAi()
                 && !(mob instanceof NeutralMob && !((NeutralMob) mob).isAngryAt(player))) {
@@ -157,89 +151,96 @@ public abstract class EntityMusic
         return false;
     }
 
-    public static void spawnInstance(SoundData soundData, LocalPlayer player, Mob entity, @Nullable Float fadeInSeconds) {
-        if (fadeInSeconds == null) {
-            fadeInSeconds = ModConfigs.FADE_TIME.get().floatValue();
-        }
-        EntityMusicInstance entityMusicInstance = new EntityMusicInstance(soundData, player, entity, fadeInSeconds);
-        INSTANCES.put(soundData.soundEvent, entityMusicInstance);
-        Minecraft.getInstance().getSoundManager().queueTickingSound(entityMusicInstance);
+    public static Instance spawnInstance(SoundData soundData, Mob entity) {
+        return new Instance(soundData, entity);
     }
 
-    public static class EntityMusicInstance extends AbstractTickableSoundInstance
+    static void updateMusic() {
+        assert playing != null;
+
+        // Mute all other music
+        Minecraft.getInstance().getSoundManager().stop(null, SoundSource.MUSIC);
+
+        // Fade
+        if (playing.fadeLength > 0f) {
+            if (!playing.fadeOut) {
+                playing.setVolume(playing.getVolume() + getMasterVolume() /(playing.fadeLength *20));
+                if (playing.getVolume() >= getMasterVolume()) {
+                    playing.setVolume(getMasterVolume());
+                    playing.fadeLength = 0f;
+                }
+            } else {
+                if (isValidEntity(playing.ENTITY)) {
+                    playing.fadeOut = false;
+                } else {
+                    playing.setVolume(playing.getVolume() - getMasterVolume() / (playing.fadeLength * 20));
+                    if (playing.getVolume() <= 0) {
+                        playing.destroy();
+                    }
+                }
+                return;
+            }
+        } else if (!isValidEntity(playing.ENTITY)) {
+            playing.fade(2);
+        } else {
+            playing.setVolume(getMasterVolume());
+        }
+
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return;
+
+        // Pitch up music when at low health (unless fighting the warden)
+        float pitch = 1f;
+        boolean belowHpThreshold;
+        if (ModConfigs.HEALTH_PITCH_PERCENT.get()) {
+            belowHpThreshold = (player.getHealth()/player.getMaxHealth())*100 <= ModConfigs.HEALTH_PITCH_THRESH.get();
+        } else {
+            belowHpThreshold = player.getHealth() <= ModConfigs.HEALTH_PITCH_THRESH.get();
+        }
+        if (belowHpThreshold && !(playing.ENTITY instanceof Warden)) {
+            pitch += ModConfigs.HEALTH_PITCH_AMOUNT.get();
+        }
+
+        // Pitch up music during second phase of dragon and wither fights
+        if (ModConfigs.PHASE2_PITCH_AMOUNT.get() != 0) {
+            if (playing.ENTITY instanceof EnderDragon) {
+                List<EndCrystal> list = playing.ENTITY.level().getEntitiesOfClass(EndCrystal.class, AABB.ofSize(new Vec3(0, 64, 0), 128, 128, 128));
+                if (list.isEmpty()) {
+                    pitch += ModConfigs.PHASE2_PITCH_AMOUNT.get();
+                }
+            } else if (playing.ENTITY instanceof WitherBoss && ((WitherBoss) playing.ENTITY).isPowered()) {
+                pitch += ModConfigs.PHASE2_PITCH_AMOUNT.get();
+            }
+        }
+
+        // Apply pitch changes
+        playing.setPitch(pitch);
+    }
+
+    protected static class Instance extends AbstractSoundInstance
     {
         // Fields
         public final SoundData SOUND_DATA;
-        public final LocalPlayer PLAYER;
         public final Mob ENTITY;
-        private float fadeSeconds;
-        private boolean fadingIn;
+        public float fadeLength;
+        public boolean fadeOut = false;
 
         // Constructors
-        public EntityMusicInstance(@NotNull SoundData soundData, LocalPlayer player, Mob entity, float fadeInSeconds) {
-            super(soundData.soundEvent, SoundSource.NEUTRAL, RandomSource.create());
+        public Instance(SoundData soundData, Mob entity) {
+            super(ModSounds.MINI1.get(), SoundSource.NEUTRAL, RandomSource.create());
             this.looping = true;
             this.relative = true;
             this.SOUND_DATA = soundData;
-            this.PLAYER = player;
             this.ENTITY = entity;
+
+            float fadeInSeconds = ModConfigs.FADE_TIME.get().floatValue();
             this.volume = (fadeInSeconds == 0) ? EntityMusic.masterVolume : 0f;
-            this.fadeSeconds = fadeInSeconds;
-            this.fadingIn = (fadeInSeconds > 0);
+            this.fadeLength = fadeInSeconds;
+
+            Minecraft.getInstance().getSoundManager().play(this);
         }
 
         // Methods
-        @Override
-        public void tick() {
-            if (this.isStopped()) return;
-
-            // Mute all other music
-            SoundManager soundManager = Minecraft.getInstance().getSoundManager();
-            soundManager.stop(null, SoundSource.MUSIC);
-
-            // Fade
-            if (this.fadeSeconds > 0f) {
-                if (this.fadingIn) {
-                    this.volume += EntityMusic.masterVolume /(this.fadeSeconds*20);
-                    if (this.volume >= EntityMusic.masterVolume) {
-                        this.volume = EntityMusic.masterVolume;
-                        this.fadeSeconds = 0f;
-                        this.fadingIn = false;
-                    }
-                } else {
-                    this.volume -= EntityMusic.masterVolume /(this.fadeSeconds*20);
-                    if (this.volume <= 0f) {
-                        this.destroy();
-                    }
-                }
-            } else {
-                // If entity is no longer valid for playing music to the player, fade out the sound
-                if (!isValidEntity(this.ENTITY)) {
-                    fadeOut(2);
-                }
-            }
-
-            float pitchMod = 1f;
-            // Pitch up music when at low health (unless fighting the warden)
-            boolean belowHpThreshold;
-            if (ModConfigs.HEALTH_PITCH_PERCENT.get()) {
-                belowHpThreshold = (this.PLAYER.getHealth()/this.PLAYER.getMaxHealth())*100 <= ModConfigs.HEALTH_PITCH_THRESH.get();
-            } else {
-                belowHpThreshold = this.PLAYER.getHealth() <= ModConfigs.HEALTH_PITCH_THRESH.get();
-            }
-            if (belowHpThreshold && !(this.ENTITY instanceof Warden)) {
-                pitchMod += ModConfigs.HEALTH_PITCH_AMOUNT.get();
-            }
-            // Pitch up music during second phase of dragon fight
-            if (this.ENTITY instanceof EnderDragon && ((EnderDragon)this.ENTITY).nearestCrystal == null) {
-                List<EndCrystal> list = this.ENTITY.level().getEntitiesOfClass(EndCrystal.class, AABB.ofSize(new Vec3(0, 60, 0), 64, 64, 64));
-                if (list.isEmpty()) {
-                    pitchMod += ModConfigs.DRAGON_PITCH_AMOUNT.get();
-                }
-            }
-            this.pitch = pitchMod;
-        }
-
         @Override
         public boolean canStartSilent() {
             return true;
@@ -253,17 +254,16 @@ public abstract class EntityMusic
         }
 
         public void destroy() {
-            this.stop();
-            SoundManager soundManager = Minecraft.getInstance().getSoundManager();
-            soundManager.stop(this);
-            INSTANCES.remove(this.SOUND_DATA.soundEvent);
+            Minecraft.getInstance().getSoundManager().stop(this);
+            playing = null;
         }
 
-        public void fadeOut(float seconds) {
-            this.fadingIn = false;
-            this.fadeSeconds = seconds;
+        public void fade(float seconds) {
+            this.fadeOut = true;
             if (seconds == 0) {
                 this.destroy();
+            } else {
+                this.fadeLength = seconds;
             }
         }
     }

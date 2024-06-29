@@ -5,7 +5,7 @@ plugins {
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
-version = '1.0.2'
+version = '1.1.0'
 group = 'com.nekotune.battlemusic' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'battlemusic'
 
@@ -151,7 +151,7 @@ jar {
         attributes([
                 "Specification-Title"     : "battlemusic",
                 "Specification-Vendor"    : "nekotune",
-                "Specification-Version"   : "1.20-1.0",
+                "Specification-Version"   : "1.20-1.1",
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : project.jar.archiveVersion,
                 "Implementation-Vendor"   : "nekotune",

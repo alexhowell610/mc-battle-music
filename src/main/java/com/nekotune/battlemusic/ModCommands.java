@@ -14,6 +14,8 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.nekotune.battlemusic.EntityMusic.playing;
+
 public abstract class ModCommands
 {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -29,6 +31,8 @@ public abstract class ModCommands
                         .executes(ModCommands::separateVolume))))
             .then(Commands.literal("reload")
                 .executes(ModCommands::reload))
+            .then(Commands.literal("debug")
+                .executes(ModCommands::debug))
             .then(Commands.literal("set")
                 .then(Commands.argument("entity", ResourceLocationArgument.id()).suggests(SuggestionProviders.SUMMONABLE_ENTITIES)
                     .executes((ctx) -> ModCommands.set(ctx, false, false))
@@ -67,12 +71,21 @@ public abstract class ModCommands
     private static int reload(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         source.sendSuccess(() -> Component.literal("Reloaded battle music"), true);
-        return ModCommands.reload();
+        BattleMusic.reload();
+        return 1;
     }
 
-    private static int reload() {
-        EntityMusic.updateEntitySoundData();
-        EntityMusic.setMasterVolume(ModConfigs.VOLUME.get().floatValue());
+    private static int debug(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        BattleMusic.LOGGER.debug("BATTLE MUSIC DEBUG INFO\n"
+                +"  - Entity playing music: " + ((playing != null) ? playing.ENTITY.getName().getString() : "NULL") + "\n"
+                +"  - Sound being played: " + ((playing != null) ? playing.SOUND_DATA.soundEvent().getLocation() : "NULL") + "\n"
+                +"  - Volume: " + ((playing != null) ? playing.getVolume() : "0") + "\n"
+                +"  - Pitch: " + ((playing != null) ? playing.getPitch() : "1") + "\n"
+                +"  - Fading out? " + (playing != null && playing.fadeOut) + "\n"
+                +"  - Priority: " + ((playing != null) ? playing.SOUND_DATA.priority() : "0")
+            );
+        source.sendSuccess(() -> Component.literal("Logged debug info to logs/debug.log"), true);
         return 1;
     }
 
@@ -114,6 +127,7 @@ public abstract class ModCommands
             return 1;
         }
         source.sendSuccess(() -> Component.literal(success), true);
-        return ModCommands.reload();
+        BattleMusic.reload();
+        return 1;
     }
 }
