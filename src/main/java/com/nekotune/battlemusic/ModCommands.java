@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -14,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.nekotune.battlemusic.EntityMusic.playing;
+import static com.nekotune.battlemusic.BattleMusic.playing;
 
 public abstract class ModCommands
 {
@@ -48,7 +49,7 @@ public abstract class ModCommands
         float volume = context.getArgument("volume", float.class);
         ModConfigs.VOLUME.set((double) volume);
         ModConfigs.VOLUME.save();
-        EntityMusic.setMasterVolume(volume);
+        BattleMusic.setVolume(volume);
         source.sendSuccess(() -> Component.literal("Set battle music volume to " + volume), true);
         return 1;
     }
@@ -78,12 +79,13 @@ public abstract class ModCommands
     private static int debug(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         BattleMusic.LOGGER.debug("BATTLE MUSIC DEBUG INFO\n"
-                +"  - Entity playing music: " + ((playing != null) ? playing.ENTITY.getName().getString() : "NULL") + "\n"
-                +"  - Sound being played: " + ((playing != null) ? playing.SOUND_DATA.soundEvent().getLocation() : "NULL") + "\n"
+                +"  - Is sound playing? " + ((playing != null) ? Minecraft.getInstance().getSoundManager().isActive(playing) : "false") + "\n"
+                +"  - Entity playing music: " + ((playing != null) ? playing.entity.getName().getString() : "NULL") + "\n"
+                +"  - Sound being played: " + ((playing != null) ? playing.soundEvent.getLocation() : "NULL") + "\n"
                 +"  - Volume: " + ((playing != null) ? playing.getVolume() : "0") + "\n"
                 +"  - Pitch: " + ((playing != null) ? playing.getPitch() : "1") + "\n"
                 +"  - Fading out? " + (playing != null && playing.fadeOut) + "\n"
-                +"  - Priority: " + ((playing != null) ? playing.SOUND_DATA.priority() : "0")
+                +"  - Priority: " + ((playing != null) ? playing.priority : "0")
             );
         source.sendSuccess(() -> Component.literal("Logged debug info to logs/debug.log"), true);
         return 1;
