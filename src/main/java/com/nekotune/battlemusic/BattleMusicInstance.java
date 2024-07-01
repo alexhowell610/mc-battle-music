@@ -81,7 +81,6 @@ public class BattleMusicInstance extends SimpleSoundInstance
                 }
             } else {
                 if (validEntities.contains(this.entity)) {
-                    System.out.println("Cancelled fading out");
                     this.fadeOut = false;
                 } else {
                     this.volume -= (BattleMusic.getVolume()) / (this.fadeLength * 20);
@@ -92,7 +91,6 @@ public class BattleMusicInstance extends SimpleSoundInstance
                 return;
             }
         } else if (!validEntities.contains(this.entity)) {
-            System.out.println("Fading out");
             this.fade(Math.max(ModConfigs.FADE_TIME.get().floatValue(), 2f));
         } else {
             this.volume = BattleMusic.getVolume();

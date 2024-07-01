@@ -207,11 +207,9 @@ public class BattleMusic
                 if (validEntity((Mob)entity, false)) {
                     if (!validEntities.contains(entity)) {
                         validEntities.add((Mob)entity);
-                        System.out.println("Added entity to valid entities");
                     }
                 } else {
                     validEntities.remove((Mob)entity);
-                    System.out.println("Removed entity from valid entities [2]");
                 }
             }
         }
