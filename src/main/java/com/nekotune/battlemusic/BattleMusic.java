@@ -5,7 +5,7 @@ import com.mojang.serialization.DataResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -23,6 +23,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -66,7 +67,15 @@ public class BattleMusic
     }
 
     // Static hashmap of what entities play what sounds
-    public record EntitySoundData(SoundEvent soundEvent, int priority){}
+    public static class EntitySoundData {
+        public SoundEvent soundEvent;
+        public int priority;
+        
+        public EntitySoundData(SoundEvent soundEvent, int priority) {
+            this.soundEvent = soundEvent;
+            this.priority = priority;
+        }
+    }
     private static final HashMap<EntityType<?>, EntitySoundData> ENTITY_SOUND_DATA = new HashMap<>();
     public static void updateEntitySoundData() {
         ENTITY_SOUND_DATA.clear();
@@ -164,8 +173,9 @@ public class BattleMusic
         if (player == null || player.isDeadOrDying()) return false;
         if (mob == null || mob.isDeadOrDying()) return false;
 
-        Tag bossFight = mob.serializeNBT().get("BossFight");
-        if (bossFight != null && bossFight.getId() == 0) return false;
+        CompoundTag compoundTag = new CompoundTag();
+        mob.saveWithoutId(compoundTag);
+        if (compoundTag.contains("BossFight") && !compoundTag.getBoolean("BossFight")) return false;
 
         if (ENTITY_SOUND_DATA.get(mob.getType()) != null
                 && mob.level().dimensionType().equals(player.level().dimensionType())
@@ -174,7 +184,6 @@ public class BattleMusic
                 && !(mob instanceof NeutralMob && !((NeutralMob) mob).isAngryAt(player))) {
             AttributeInstance frAttribute = mob.getAttribute(Attributes.FOLLOW_RANGE);
             double followRange = (frAttribute != null) ? frAttribute.getValue() : MAX_SONG_RANGE;
-            if (toStart) followRange /= 2;
             if (mob instanceof EnderDragon) {
                 followRange = 300; // Because the ender dragon is special
             }
@@ -198,6 +207,14 @@ public class BattleMusic
         @SubscribeEvent
         public static void onCommandRegister(RegisterCommandsEvent event) {
             ModCommands.register(event.getDispatcher());
+        }
+
+        @SubscribeEvent
+        public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+            if (playing != null) {
+                playing.stop();
+            }
+            validEntities.clear();
         }
 
         // Update valid entities
@@ -239,12 +256,12 @@ public class BattleMusic
 
                 if (playing != null) {
                     // Ensure this music has higher priority
-                    if (playing.priority >= soundData.priority()) {
+                    if (playing.priority >= soundData.priority) {
                         continue;
                     }
                     // If the music is already playing at a lower priority, just change the priority and entity
-                    if (playing.soundEvent.getLocation().equals(soundData.soundEvent().getLocation())) {
-                        playing.priority = soundData.priority();
+                    if (playing.soundEvent.getLocation().equals(soundData.soundEvent.getLocation())) {
+                        playing.priority = soundData.priority;
                         playing.entity = entity;
                         continue;
                     }
@@ -252,10 +269,10 @@ public class BattleMusic
 
                 // Only overwrite final variables if priority is higher and music is different
                 if (f_soundData != null) {
-                    if (f_soundData.priority() >= soundData.priority()) {
+                    if (f_soundData.priority >= soundData.priority) {
                         continue;
                     }
-                    if (f_soundData.soundEvent().getLocation().equals(soundData.soundEvent().getLocation())) {
+                    if (f_soundData.soundEvent.getLocation().equals(soundData.soundEvent.getLocation())) {
                         f_soundData = soundData;
                         continue;
                     }

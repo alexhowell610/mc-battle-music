@@ -31,12 +31,12 @@ public class BattleMusicInstance extends SimpleSoundInstance
 
     // Constructors
     public BattleMusicInstance(BattleMusic.EntitySoundData soundData, Mob entity) {
-        super(soundData.soundEvent().getLocation(), SoundSource.MASTER,
+        super(soundData.soundEvent.getLocation(), SoundSource.MASTER,
                 (ModConfigs.FADE_TIME.get().floatValue() == 0) ? BattleMusic.getVolume() : 0.0f,
                 1.0F, SoundInstance.createUnseededRandom(), true,
                 0, SoundInstance.Attenuation.NONE, 0.0D, 0.0D, 0.0D, true);
-        this.soundEvent = soundData.soundEvent();
-        this.priority = soundData.priority();
+        this.soundEvent = soundData.soundEvent;
+        this.priority = soundData.priority;
         this.entity = entity;
         this.fadeLength = ModConfigs.FADE_TIME.get().floatValue();
     }
@@ -56,6 +56,7 @@ public class BattleMusicInstance extends SimpleSoundInstance
 
     public void stop() {
         Minecraft.getInstance().getSoundManager().stop(this);
+        this.fadeLength = 0;
         BattleMusic.playing = null;
     }
 
