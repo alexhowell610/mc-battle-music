@@ -16,14 +16,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -167,7 +164,7 @@ public class BattleMusic
         if (mob == null || mob.isDeadOrDying()) return false;
 
         if (ENTITY_SOUND_DATA.get(mob.getType()) != null
-                && mob.level().equals(player.level())
+                && mob.level().dimensionType().equals(player.level().dimensionType())
                 && !mob.isSleeping() && !mob.isNoAi()
                 && !mob.isAlliedTo(player.self())
                 && !(mob instanceof NeutralMob && !((NeutralMob) mob).isAngryAt(player))) {
@@ -203,6 +200,9 @@ public class BattleMusic
         @SubscribeEvent
         public static void onLivingTick(LivingEvent.LivingTickEvent event) {
             LivingEntity entity = event.getEntity();
+            LocalPlayer player = Minecraft.getInstance().player;
+            if (player == null || entity.level() != player.level()) return;
+
             if (entity instanceof Mob) {
                 if (validEntity((Mob)entity, false)) {
                     if (!validEntities.contains(entity)) {

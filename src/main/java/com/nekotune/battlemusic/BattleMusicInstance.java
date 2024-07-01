@@ -17,7 +17,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import java.util.List;
 
-import static com.nekotune.battlemusic.BattleMusic.validEntity;
+import static com.nekotune.battlemusic.BattleMusic.validEntities;
 
 @OnlyIn(Dist.CLIENT)
 public class BattleMusicInstance extends SimpleSoundInstance
@@ -80,7 +80,8 @@ public class BattleMusicInstance extends SimpleSoundInstance
                     this.fadeLength = 0f;
                 }
             } else {
-                if (validEntity(this.entity, true)) {
+                if (validEntities.contains(this.entity)) {
+                    System.out.println("Cancelled fading out");
                     this.fadeOut = false;
                 } else {
                     this.volume -= (BattleMusic.getVolume()) / (this.fadeLength * 20);
@@ -90,8 +91,9 @@ public class BattleMusicInstance extends SimpleSoundInstance
                 }
                 return;
             }
-        } else if (!validEntity(this.entity, false)) {
-            this.fade(2);
+        } else if (!validEntities.contains(this.entity)) {
+            System.out.println("Fading out");
+            this.fade(Math.max(ModConfigs.FADE_TIME.get().floatValue(), 2f));
         } else {
             this.volume = BattleMusic.getVolume();
         }
