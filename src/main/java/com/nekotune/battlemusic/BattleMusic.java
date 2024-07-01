@@ -5,6 +5,7 @@ import com.mojang.serialization.DataResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -163,6 +164,9 @@ public class BattleMusic
         if (player == null || player.isDeadOrDying()) return false;
         if (mob == null || mob.isDeadOrDying()) return false;
 
+        Tag bossFight = mob.serializeNBT().get("BossFight");
+        if (bossFight != null && bossFight.getId() == 0) return false;
+
         if (ENTITY_SOUND_DATA.get(mob.getType()) != null
                 && mob.level().dimensionType().equals(player.level().dimensionType())
                 && !mob.isSleeping() && !mob.isNoAi()
@@ -204,12 +208,10 @@ public class BattleMusic
             if (player == null || entity.level() != player.level()) return;
 
             if (entity instanceof Mob) {
-                if (validEntity((Mob)entity, false)) {
+                if (validEntity((Mob)entity, true)) {
                     if (!validEntities.contains(entity)) {
                         validEntities.add((Mob)entity);
                     }
-                } else {
-                    validEntities.remove((Mob)entity);
                 }
             }
         }
@@ -223,11 +225,15 @@ public class BattleMusic
 
             EntitySoundData f_soundData = null;
             Mob f_entity = null;
+            for (int i = 0; i < validEntities.size(); i++) {
+                Mob entity = validEntities.get(i);
 
-            for (Mob entity : validEntities)
-            {
-                // Ensure entity is still valid
-                if (!validEntity(entity, false)) continue;
+                // Remove and skip invalid entities
+                if (!validEntity(entity, false)) {
+                    validEntities.remove(entity);
+                    i--;
+                    continue;
+                }
 
                 EntitySoundData soundData = getEntitySoundData().get(entity.getType());
 
