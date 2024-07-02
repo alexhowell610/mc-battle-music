@@ -175,7 +175,7 @@ public class BattleMusic
         if (mob == null || mob.isDeadOrDying()) return false;
 
         if (ModList.get().isLoaded("aether")) {
-            if (mob instanceof A) return false;
+            //if (mob) return false;
         }
 
         if (ENTITY_SOUND_DATA.get(mob.getType()) != null
