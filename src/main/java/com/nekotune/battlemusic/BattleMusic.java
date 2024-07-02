@@ -1,11 +1,11 @@
 package com.nekotune.battlemusic;
 
+import com.aetherteam.nitrogen.entity.BossMob;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.DataResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -174,8 +174,8 @@ public class BattleMusic
         if (player == null || player.isDeadOrDying()) return false;
         if (mob == null || mob.isDeadOrDying()) return false;
 
-        if (ModList.get().isLoaded("aether")) {
-            //if (mob) return false;
+        if (ModList.get().isLoaded("nitrogen")) {
+            if (mob instanceof BossMob && ((BossMob<?>)mob).isBossFight()) return false;
         }
 
         if (ENTITY_SOUND_DATA.get(mob.getType()) != null
