@@ -27,6 +27,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -70,13 +71,13 @@ public class BattleMusic
     public static class EntitySoundData {
         public SoundEvent soundEvent;
         public int priority;
-        
+
         public EntitySoundData(SoundEvent soundEvent, int priority) {
             this.soundEvent = soundEvent;
             this.priority = priority;
         }
     }
-    private static final HashMap<EntityType<?>, EntitySoundData> ENTITY_SOUND_DATA = new HashMap<>();
+    protected static final HashMap<EntityType<?>, EntitySoundData> ENTITY_SOUND_DATA = new HashMap<>();
     public static void updateEntitySoundData() {
         ENTITY_SOUND_DATA.clear();
         List<? extends String> entityDataStrings = ModConfigs.ENTITIES_SONGS.get();
@@ -173,9 +174,9 @@ public class BattleMusic
         if (player == null || player.isDeadOrDying()) return false;
         if (mob == null || mob.isDeadOrDying()) return false;
 
-        CompoundTag compoundTag = new CompoundTag();
-        mob.saveWithoutId(compoundTag);
-        if (compoundTag.contains("BossFight") && !compoundTag.getBoolean("BossFight")) return false;
+        if (ModList.get().isLoaded("aether")) {
+            if (mob instanceof A) return false;
+        }
 
         if (ENTITY_SOUND_DATA.get(mob.getType()) != null
                 && mob.level().dimensionType().equals(player.level().dimensionType())
