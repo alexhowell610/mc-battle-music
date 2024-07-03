@@ -15,7 +15,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -37,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 
 @Mod(BattleMusic.MOD_ID)
-@OnlyIn(Dist.CLIENT)
 public class BattleMusic
 {
     public static final String MOD_ID = "battlemusic";
