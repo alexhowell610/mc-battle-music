@@ -78,15 +78,7 @@ public abstract class ModCommands
 
     private static int debug(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        BattleMusic.LOGGER.debug("BATTLE MUSIC DEBUG INFO\n"
-                +"  - Is sound playing? " + ((playing != null) ? Minecraft.getInstance().getSoundManager().isActive(playing) : "false") + "\n"
-                +"  - Entity playing music: " + ((playing != null) ? playing.entity.getName().getString() : "NULL") + "\n"
-                +"  - Sound being played: " + ((playing != null) ? playing.soundEvent.getLocation() : "NULL") + "\n"
-                +"  - Volume: " + ((playing != null) ? playing.getVolume() : "0") + "\n"
-                +"  - Pitch: " + ((playing != null) ? playing.getPitch() : "1") + "\n"
-                +"  - Fading out? " + (playing != null && playing.fadeOut) + "\n"
-                +"  - Priority: " + ((playing != null) ? playing.priority : "0")
-            );
+        BattleMusic.LOGGER.debug("BATTLE MUSIC DEBUG INFO\n  - Is sound playing? {}\n  - Entity playing music: {}\n  - Sound being played: {}\n  - Volume: {}\n  - Pitch: {}\n  - Fading out? {}\n  - Priority: {}", (playing != null) ? Minecraft.getInstance().getSoundManager().isActive(playing) : "false", (playing != null) ? playing.entity.getName().getString() : "NULL", (playing != null) ? playing.soundEvent.getLocation() : "NULL", (playing != null) ? playing.getVolume() : "0", (playing != null) ? playing.getPitch() : "1", playing != null && playing.fadeOut, (playing != null) ? playing.priority : "0");
         source.sendSuccess(() -> Component.literal("Logged debug info to logs/debug.log"), true);
         return 1;
     }

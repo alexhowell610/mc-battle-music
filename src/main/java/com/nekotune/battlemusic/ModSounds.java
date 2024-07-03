@@ -40,8 +40,11 @@ public abstract class ModSounds
     public static final RegistryObject<SoundEvent> WILDFIRE = registerSoundEvent("wildfire");
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
-        ResourceLocation id = new ResourceLocation(BattleMusic.MOD_ID, name);
-        return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(id));
+        ResourceLocation id = ResourceLocation.tryBuild(BattleMusic.MOD_ID, name);
+        return SOUND_EVENTS.register(name, () -> {
+            assert id != null;
+            return SoundEvent.createVariableRangeEvent(id);
+        });
     }
 
     public static void register(IEventBus eventBus) {

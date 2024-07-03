@@ -15,7 +15,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -37,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 
 @Mod(BattleMusic.MOD_ID)
-@OnlyIn(Dist.CLIENT)
 public class BattleMusic
 {
     public static final String MOD_ID = "battlemusic";
@@ -85,23 +83,23 @@ public class BattleMusic
 
             String entityString = entityDataString.substring(0, entityDataString.indexOf(';'));
             DataResult<ResourceLocation> weakEntityResource = ResourceLocation.read(entityString);
-            if (weakEntityResource.get().left().isPresent()) {
-                ResourceLocation resource = weakEntityResource.get().left().get();
+            if (weakEntityResource.result().isPresent()) {
+                ResourceLocation resource = weakEntityResource.getOrThrow();
                 entityType = ForgeRegistries.ENTITY_TYPES.getValue(resource);
             }
             if (entityType == null || entityType == EntityType.PIG) {
-                LOGGER.warn(ERROR_MSG + "Skipping invalid entity ID \"" + entityString + "\" (You can ignore this warning)");
+                LOGGER.warn(ERROR_MSG + "Skipping invalid entity ID \"{}\" (You can ignore this warning)", entityString);
                 continue;
             }
 
             String soundString = entityDataString.substring(entityDataString.indexOf(';') + 1, entityDataString.lastIndexOf(';'));
             DataResult<ResourceLocation> weakSoundResource = ResourceLocation.read(soundString);
-            if (weakSoundResource.get().left().isPresent()) {
-                ResourceLocation resource = weakSoundResource.get().left().get();
+            if (weakSoundResource.result().isPresent()) {
+                ResourceLocation resource = weakSoundResource.getOrThrow();
                 soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(resource);
             }
             if (soundEvent == null) {
-                LOGGER.error(ERROR_MSG + "Invalid sound ID \"" + soundString + "\" in line \"" + entityDataString + "\", skipping");
+                LOGGER.error(ERROR_MSG + "Invalid sound ID \"{}\" in line \"{}\", skipping", soundString, entityDataString);
                 continue;
             }
 
@@ -110,10 +108,10 @@ public class BattleMusic
             try {
                 priority = Integer.parseInt(priorityString);
             } catch(Exception e) {
-                LOGGER.error(ERROR_MSG + "Invalid priority \"" + priorityString + "\" in line \"" + entityDataString + "\", defaulting to 0");
+                LOGGER.error(ERROR_MSG + "Invalid priority \"{}\" in line \"{}\", defaulting to 0", priorityString, entityDataString);
             }
 
-            LOGGER.debug("Added battle music " + soundEvent.getLocation() + " to " + entityType + " with priority " + priority);
+            LOGGER.debug("Added battle music {} to {} with priority {}", soundEvent.getLocation(), entityType, priority);
             ENTITY_SOUND_DATA.put(entityType, new EntitySoundData(soundEvent, priority));
         }
 
@@ -121,12 +119,12 @@ public class BattleMusic
         if (!defaultSongString.isEmpty()) {
             SoundEvent defaultSong = null;
             DataResult<ResourceLocation> weakDefaultSongResource = ResourceLocation.read(defaultSongString);
-            if (weakDefaultSongResource.get().left().isPresent()) {
-                ResourceLocation resource = weakDefaultSongResource.get().left().get();
+            if (weakDefaultSongResource.result().isPresent()) {
+                ResourceLocation resource = weakDefaultSongResource.getOrThrow();
                 defaultSong = ForgeRegistries.SOUND_EVENTS.getValue(resource);
             }
             if (defaultSong == null) {
-                LOGGER.error(ERROR_MSG + "Invalid default song sound ID \"" + defaultSongString + "\"");
+                LOGGER.error(ERROR_MSG + "Invalid default song sound ID \"{}\"", defaultSongString);
             } else {
                 for (EntityType<?> e : ForgeRegistries.ENTITY_TYPES.getValues()) {
                     ENTITY_SOUND_DATA.putIfAbsent(e, new EntitySoundData(defaultSong, Integer.MIN_VALUE));
