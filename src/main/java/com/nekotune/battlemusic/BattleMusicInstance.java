@@ -2,7 +2,7 @@ package com.nekotune.battlemusic;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -20,7 +20,7 @@ import java.util.List;
 import static com.nekotune.battlemusic.BattleMusic.validEntities;
 
 @OnlyIn(Dist.CLIENT)
-public class BattleMusicInstance extends SimpleSoundInstance
+public class BattleMusicInstance extends AbstractTickableSoundInstance
 {
     // Fields
     public Mob entity;
@@ -31,10 +31,11 @@ public class BattleMusicInstance extends SimpleSoundInstance
 
     // Constructors
     public BattleMusicInstance(BattleMusic.EntitySoundData soundData, Mob entity) {
-        super(soundData.soundEvent.getLocation(), SoundSource.MASTER,
-                (ModConfigs.FADE_TIME.get().floatValue() == 0) ? BattleMusic.getVolume() : 0.0f,
-                1.0F, SoundInstance.createUnseededRandom(), true,
-                0, SoundInstance.Attenuation.NONE, 0.0D, 0.0D, 0.0D, true);
+        super(soundData.soundEvent, SoundSource.MASTER, SoundInstance.createUnseededRandom());
+        this.volume = (ModConfigs.FADE_TIME.get().floatValue() == 0) ? BattleMusic.getVolume() : 0.0f;
+        this.looping = true;
+        this.relative = true;
+
         this.soundEvent = soundData.soundEvent;
         this.priority = soundData.priority;
         this.entity = entity;
@@ -54,23 +55,27 @@ public class BattleMusicInstance extends SimpleSoundInstance
         this.pitch = pitch;
     }
 
-    public void stop() {
+    public void destroy() {
+        this.stop();
         Minecraft.getInstance().getSoundManager().stop(this);
         this.fadeLength = 0;
-        BattleMusic.playing = null;
+        if (BattleMusic.playing == this) {
+            BattleMusic.playing = null;
+        }
     }
 
     public void fade(float seconds) {
         this.fadeOut = true;
         if (seconds == 0) {
-            this.stop();
+            this.destroy();
         } else {
             this.fadeLength = seconds;
         }
     }
 
     public void tick() {
-        if (!Minecraft.getInstance().getSoundManager().isActive(this)) return;
+        if (this.isStopped()) return;
+        Minecraft.getInstance().getSoundManager().stop(null, SoundSource.MUSIC);
 
         // Fade
         if (this.fadeLength > 0f) {
@@ -86,7 +91,7 @@ public class BattleMusicInstance extends SimpleSoundInstance
                 } else {
                     this.volume -= (BattleMusic.getVolume()) / (this.fadeLength * 20);
                     if (this.volume <= 0) {
-                        this.stop();
+                        this.destroy();
                     }
                 }
                 return;

@@ -9,10 +9,7 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -137,7 +134,7 @@ public class BattleMusic
             }
         }
         if (playing != null) {
-            playing.stop();
+            playing.destroy();
         }
         LOGGER.debug("[BATTLE MUSIC] Updated entity sound data");
     }
@@ -187,9 +184,7 @@ public class BattleMusic
             if (mob instanceof EnderDragon) {
                 followRange = 300; // Because the ender dragon is special
             }
-            if (toStart && (!player.hasLineOfSight(mob) || !mob.hasLineOfSight(player))) {
-                return false;
-            }
+            if (toStart && (!player.hasLineOfSight(mob) || !mob.hasLineOfSight(player))) return false;
             return mob.canAttack(player, TargetingConditions.forCombat().range(followRange).ignoreLineOfSight().ignoreInvisibilityTesting());
         }
         return false;
@@ -200,7 +195,7 @@ public class BattleMusic
         validEntities.clear();
     }
 
-    @Mod.EventBusSubscriber(modid = BattleMusic.MOD_ID)
+    @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = BattleMusic.MOD_ID)
     public static abstract class ForgeEvents
     {
         // Register commands
@@ -212,7 +207,7 @@ public class BattleMusic
         @SubscribeEvent
         public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
             if (playing != null) {
-                playing.stop();
+                playing.destroy();
             }
             validEntities.clear();
         }
@@ -286,16 +281,10 @@ public class BattleMusic
             SoundManager sounds = Minecraft.getInstance().getSoundManager();
             if (f_soundData != null && validEntity(f_entity, true)) {
                 if (playing != null) {
-                    playing.stop();
+                    playing.destroy();
                 }
                 playing = new BattleMusicInstance(f_soundData, f_entity);
-                sounds.play(playing);
-            }
-
-            if (playing != null) {
-                playing.tick();
-                sounds.stop(null, SoundSource.MUSIC);
-                sounds.updateSourceVolume(SoundSource.MUSIC, Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MUSIC));
+                sounds.queueTickingSound(playing);
             }
         }
     }
