@@ -176,7 +176,7 @@ public class BattleMusic
                 && mob.level().dimensionType().equals(player.level().dimensionType())
                 && !mob.isSleeping() && !mob.isNoAi()
                 && !mob.isAlliedTo(player.self())
-                && !(mob instanceof NeutralMob && !((NeutralMob) mob).isAngryAt(player))) {
+                && !(mob instanceof NeutralMob && !mob.isAggressive())) {
             AttributeInstance frAttribute = mob.getAttribute(Attributes.FOLLOW_RANGE);
             double followRange = (frAttribute != null) ? frAttribute.getValue() : MAX_SONG_RANGE;
             if (mob instanceof EnderDragon) {
