@@ -41,7 +41,6 @@ public class BattleMusic
     public static final String MOD_ID = "battlemusic";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final float VOLUME_REDUCTION = 2f;
-    public static final double MAX_SONG_RANGE = 256D;
     public static BattleMusicInstance playing = null;
     private static float volume = 1f;
     public static ArrayList<Mob> validEntities = new ArrayList<>();
@@ -177,13 +176,18 @@ public class BattleMusic
                 && !mob.isSleeping() && !mob.isNoAi()
                 && !mob.isAlliedTo(player.self())
                 && !(mob instanceof NeutralMob && !mob.isAggressive())) {
+            double maxMusicDistance = ModConfigs.MAX_MUSIC_DISTANCE.get();
             AttributeInstance frAttribute = mob.getAttribute(Attributes.FOLLOW_RANGE);
-            double followRange = (frAttribute != null) ? frAttribute.getValue() : MAX_SONG_RANGE;
+            double followRange = (frAttribute != null) ? frAttribute.getValue() : maxMusicDistance;
+            double attackRange = Math.max(followRange, maxMusicDistance);
             if (mob instanceof EnderDragon) {
-                followRange = 300; // Because the ender dragon is special
+                attackRange = Math.max(attackRange, 300D); // Because the ender dragon is special
+            }
+            if (player.distanceToSqr(mob) > maxMusicDistance * maxMusicDistance) {
+                return false;
             }
             if (toStart && (!player.hasLineOfSight(mob) || !mob.hasLineOfSight(player))) return false;
-            return mob.canAttack(player, TargetingConditions.forCombat().range(followRange).ignoreLineOfSight().ignoreInvisibilityTesting());
+            return mob.canAttack(player, TargetingConditions.forCombat().range(attackRange).ignoreLineOfSight().ignoreInvisibilityTesting());
         }
         return false;
     }
