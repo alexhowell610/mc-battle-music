@@ -63,33 +63,12 @@ repositories {
 }
 
 
-configurations.configureEach {
-    // Force any accidental NeoForge-mapped requests back to the correct Forge artifacts
-    resolutionStrategy.eachDependency { details ->
-        def r = details.requested
-        if (r.group == 'com.aetherteam.aether' && r.name == 'aether') {
-            details.useTarget "com.aetherteam.aether:aether:1.20.1-1.4.2-forge"
-        }
-        if (r.group == 'com.aetherteam.nitrogen' && r.name == 'nitrogen_internals') {
-            details.useTarget "com.aetherteam.nitrogen:nitrogen_internals:1.20.1-1.0.9-forge"
-        }
-    }
-}
-
 dependencies {
     // Forge
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     // jopt-simple pin
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
-
-    // Aether/Nitrogen — Forge variants (dev-time deobf)
-    compileOnly fg.deobf("com.aetherteam.aether:aether:1.20.1-1.4.2-forge")
-    compileOnly fg.deobf("com.aetherteam.nitrogen:nitrogen_internals:1.20.1-1.0.9-forge")
-
-    // If you want them present in your dev runs, also add:
-    // runtimeOnly fg.deobf("com.aetherteam.aether:aether:1.20.1-1.4.2-forge")
-    // runtimeOnly fg.deobf("com.aetherteam.nitrogen:nitrogen_internals:1.20.1-1.0.9-forge")
 }
 
 tasks.named('processResources', ProcessResources).configure {
