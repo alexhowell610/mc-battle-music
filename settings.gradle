@@ -1,11 +1,35 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        maven { url = 'https://maven.minecraftforge.net/' }
-        maven { url = 'https://maven.parchmentmc.org' }
+        maven { url = "https://maven.minecraftforge.net/" }
+        maven { url = "https://maven.parchmentmc.org" }
+        mavenCentral()
     }
 }
 
+/* The plugins {} block must come before other top-level blocks */
 plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.7.0'
+    id "org.gradle.toolchains.foojay-resolver-convention" version "0.7.0"
 }
+
+dependencyResolutionManagement {
+    // Allow project-level repositories so build.gradle repos apply
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
+
+    repositories {
+        mavenCentral()
+        maven { name = "Minecraft"; url = "https://libraries.minecraft.net" }
+        maven { url = "https://maven.minecraftforge.net" }
+        maven { url = "https://maven.parchmentmc.org" }
+
+        // Aether/Nitrogen public package repos
+        maven { url = "https://packages.aether-mod.net/The-Aether" }
+        maven { url = "https://packages.aether-mod.net/Nitrogen" }
+
+        // Optional fallbacks
+        // maven { url = "https://api.modrinth.com/maven" }
+        // maven { url = "https://cursemaven.com" }
+    }
+}
+
+rootProject.name = "mc-battle-music"
