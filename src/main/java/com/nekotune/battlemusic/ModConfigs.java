@@ -16,7 +16,6 @@ public abstract class ModConfigs
     public static final ForgeConfigSpec.ConfigValue<Integer> HEALTH_PITCH_THRESH;
     public static final ForgeConfigSpec.ConfigValue<Boolean> HEALTH_PITCH_PERCENT;
     public static final ForgeConfigSpec.ConfigValue<Double> FADE_TIME;
-    public static final ForgeConfigSpec.ConfigValue<Double> MUSIC_STOP_DISTANCE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ENTITIES_SONGS;
     public static final ForgeConfigSpec.ConfigValue<String> DEFAULT_SONG;
 
@@ -48,8 +47,6 @@ public abstract class ModConfigs
                 .define("health_pitch_percent", false);
         FADE_TIME = BUILDER.comment("\nHow many seconds songs take to fade in and out")
                         .defineInRange("fade_time", 1D, 0D, 10D);
-        MUSIC_STOP_DISTANCE = BUILDER.comment("\nMaximum block distance from a tracked entity before battle music fades out")
-                        .defineInRange("music_stop_distance", 256D, 1D, 1024D);
         ENTITIES_SONGS = BUILDER.comment("""
 
                         Entites and their respective songs, write in entity;song;priority format      \s

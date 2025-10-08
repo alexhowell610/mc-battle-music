@@ -41,6 +41,7 @@ public class BattleMusic
     public static final String MOD_ID = "battlemusic";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final float VOLUME_REDUCTION = 2f;
+    public static final double MAX_SONG_RANGE = 256D;
     public static BattleMusicInstance playing = null;
     private static float volume = 1f;
     public static ArrayList<Mob> validEntities = new ArrayList<>();
@@ -82,8 +83,8 @@ public class BattleMusic
 
             String entityString = entityDataString.substring(0, entityDataString.indexOf(';'));
             DataResult<ResourceLocation> weakEntityResource = ResourceLocation.read(entityString);
-            if (weakEntityResource.result().isPresent()) {
-                ResourceLocation resource = weakEntityResource.getOrThrow();
+            if (weakEntityResource.get().left().isPresent()) {
+                ResourceLocation resource = weakEntityResource.get().left().get();
                 entityType = ForgeRegistries.ENTITY_TYPES.getValue(resource);
             }
             if (entityType == null || entityType == EntityType.PIG) {
@@ -93,8 +94,8 @@ public class BattleMusic
 
             String soundString = entityDataString.substring(entityDataString.indexOf(';') + 1, entityDataString.lastIndexOf(';'));
             DataResult<ResourceLocation> weakSoundResource = ResourceLocation.read(soundString);
-            if (weakSoundResource.result().isPresent()) {
-                ResourceLocation resource = weakSoundResource.getOrThrow();
+            if (weakSoundResource.get().left().isPresent()) {
+                ResourceLocation resource = weakSoundResource.get().left().get();
                 soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(resource);
             }
             if (soundEvent == null) {
@@ -118,8 +119,8 @@ public class BattleMusic
         if (!defaultSongString.isEmpty()) {
             SoundEvent defaultSong = null;
             DataResult<ResourceLocation> weakDefaultSongResource = ResourceLocation.read(defaultSongString);
-            if (weakDefaultSongResource.result().isPresent()) {
-                ResourceLocation resource = weakDefaultSongResource.getOrThrow();
+            if (weakDefaultSongResource.get().left().isPresent()) {
+                ResourceLocation resource = weakDefaultSongResource.get().left().get();
                 defaultSong = ForgeRegistries.SOUND_EVENTS.getValue(resource);
             }
             if (defaultSong == null) {
@@ -177,11 +178,9 @@ public class BattleMusic
                 && !mob.isAlliedTo(player.self())
                 && !(mob instanceof NeutralMob && !mob.isAggressive())) {
             AttributeInstance frAttribute = mob.getAttribute(Attributes.FOLLOW_RANGE);
-            double configuredRange = ModConfigs.MUSIC_STOP_DISTANCE.get();
-            double followRange = (frAttribute != null) ? frAttribute.getValue() : configuredRange;
-            followRange = Math.min(followRange, configuredRange);
+            double followRange = (frAttribute != null) ? frAttribute.getValue() : MAX_SONG_RANGE;
             if (mob instanceof EnderDragon) {
-                followRange = Math.min(300, configuredRange); // Because the ender dragon is special
+                followRange = 300; // Because the ender dragon is special
             }
             if (toStart && (!player.hasLineOfSight(mob) || !mob.hasLineOfSight(player))) return false;
             return mob.canAttack(player, TargetingConditions.forCombat().range(followRange).ignoreLineOfSight().ignoreInvisibilityTesting());
